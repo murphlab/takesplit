@@ -59,10 +59,19 @@ for my $inFile (@inFiles) {
 	}
 	my $epoch = dateTimeToEpoch($dateTimeOrig);
 	my $subSecEpoch = dateTimeToEpoch($subSecDateTimeOrig);
-	push @imageData, $exif;
+	push @imageData, { file => $inFile, epoch => $epoch, subSecEpoch => $subSecEpoch };
 }
 
-print "subSecAvailable: $subSecAvailable\n";
+my $epochKey;
+if ($subSecAvailable) {
+	print "SubSecDateTimeOriginal available (subsecond resolution)\n";
+	$epochKey = "subSecEpoch";
+} else {
+	print "SubSecDateTimeOriginal not avaialbe so using DateTimeOriginal (one-second resolution)\n";
+	$epochKey = "epoch";
+}
+
+
 
 sub dateTimeToEpoch
 {
@@ -71,8 +80,6 @@ sub dateTimeToEpoch
 	my ($date,$time) = split /\s/, $dateTime;
 	my ($year, $month, $day) = split /:/, $date;
 	my ($hour, $minute, $second) = split /:/, $time;
-	#print "dateTime: $dateTime\n";
-	print "year: $year month: $month day: $day hour: $hour minute: $minute second: $second\n";
 	my $epoch = timelocal(0,$minute,$hour,$day,$month-1,$year) + $second;
 	return $epoch;
 }
