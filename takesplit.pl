@@ -29,51 +29,65 @@ die $USAGE unless $inputDir and $outputDir;
 die "inputDir must be a directory" unless -d $inputDir;
 die "outputDir must be a directory" unless -d $outputDir;
 
-my @inFiles = (<$inputDir/*>);
-my $inFileCount = scalar @inFiles;
+my $data = loadImageData();
 
-#print "Read $inFileCount inFiles\n";
 
-my @imageData;
 
-my $subSecAvailable = 1; 
+########
+# Subs #
+########
 
-for my $inFile (@inFiles) {
-	my $exif = ImageInfo($inFile);
-	my $exifError = $exif->{Error};
-	if ($exifError) {
-		print STDERR "Could not read EXIF data from file: $inFile error: $exifError\n";
-		next;
+sub loadImageData 
+{
+	my $imageDataRef = shift;
+	my $timestampKeyRef = shift;
+
+	my @inFiles = (<$inputDir/*>);
+	my $inFileCount = scalar @inFiles;
+
+	#print "Read $inFileCount inFiles\n";
+
+	my $subSecAvailable = 1; 
+
+	my @imageData;
+
+	for my $inFile (@inFiles) {
+		my $exif = ImageInfo($inFile);
+		my $exifError = $exif->{Error};
+		if ($exifError) {
+			print STDERR "Could not read EXIF data from file: $inFile error: $exifError\n";
+			next;
+		}
+		my $exifWarning = $exif->{Warning};
+		if ($exifWarning) {
+			print STDERR "File: $inFile warning: $exifWarning";
+		}
+		my $dateTimeOrig = $exif->{DateTimeOriginal};
+		my $subSecDateTimeOrig = $exif->{SubSecDateTimeOriginal};
+		if (!($dateTimeOrig or $subSecDateTimeOrig)) {
+			die "Neither DateTimeOriginal or SubSecDateTimeOriginal EXIF tags found in file:\"$inFile\" . Exiting";
+		}
+		if (!$subSecDateTimeOrig) {
+			$subSecAvailable = 0;	
+		}
+		my $epoch = dateTimeToEpoch($dateTimeOrig);
+		my $subSecEpoch = dateTimeToEpoch($subSecDateTimeOrig);
+		push @imageData, { file => $inFile, epoch => $epoch, subSecEpoch => $subSecEpoch };
 	}
-	my $exifWarning = $exif->{Warning};
-	if ($exifWarning) {
-		print STDERR "File: $inFile warning: $exifWarning";
+
+	my $epochKey;
+	if ($subSecAvailable) {
+		print "SubSecDateTimeOriginal available (subsecond resolution)\n";
+		$epochKey = "subSecEpoch";
+	} else {
+		print "SubSecDateTimeOriginal not avaialbe so using DateTimeOriginal (one-second resolution)\n";
+		$epochKey = "epoch";
 	}
-	my $dateTimeOrig = $exif->{DateTimeOriginal};
-	my $subSecDateTimeOrig = $exif->{SubSecDateTimeOriginal};
-	if (!($dateTimeOrig or $subSecDateTimeOrig)) {
-		die "Neither DateTimeOriginal or SubSecDateTimeOriginal EXIF tags found. Exiting";
-	}
-	if (!$subSecDateTimeOrig) {
-		$subSecAvailable = 0;	
-	}
-	my $epoch = dateTimeToEpoch($dateTimeOrig);
-	my $subSecEpoch = dateTimeToEpoch($subSecDateTimeOrig);
-	push @imageData, { file => $inFile, epoch => $epoch, subSecEpoch => $subSecEpoch };
+
+	my @sortedImageData = sort { $a->{$epochKey} <=> $b->{$epochKey} } @imageData;
+
+	return { key => $epochKey, imageData => \@sortedImageData };
 }
-
-my $epochKey;
-if ($subSecAvailable) {
-	print "SubSecDateTimeOriginal available (subsecond resolution)\n";
-	$epochKey = "subSecEpoch";
-} else {
-	print "SubSecDateTimeOriginal not avaialbe so using DateTimeOriginal (one-second resolution)\n";
-	$epochKey = "epoch";
-}
-
-my @sortedImageData = sort { $a->{$epochKey} <=> $b->{$epochKey} } @imageData;
-
-
 
 sub dateTimeToEpoch
 {
