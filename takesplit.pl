@@ -39,9 +39,6 @@ my $data = loadImageData();
 
 sub loadImageData 
 {
-	my $imageDataRef = shift;
-	my $timestampKeyRef = shift;
-
 	my @inFiles = (<$inputDir/*>);
 	my $inFileCount = scalar @inFiles;
 
