@@ -34,17 +34,35 @@ my $inFileCount = scalar @inFiles;
 
 #print "Read $inFileCount inFiles\n";
 
+my @imageData;
+
+my $subSecAvailable = 1; 
+
 for my $inFile (@inFiles) {
-	#print "$inFile\n";
-	my $info = ImageInfo($inFile);
-	my $dateTimeOrig = $info->{DateTimeOriginal};
-	my $subSecDateTimeOrig = $info->{SubSecDateTimeOriginal};
-	print "$dateTimeOrig\n";
+	my $exif = ImageInfo($inFile);
+	my $exifError = $exif->{Error};
+	if ($exifError) {
+		print STDERR "Could not read EXIF data from file: $inFile error: $exifError\n";
+		next;
+	}
+	my $exifWarning = $exif->{Warning};
+	if ($exifWarning) {
+		print STDERR "File: $inFile warning: $exifWarning";
+	}
+	my $dateTimeOrig = $exif->{DateTimeOriginal};
+	my $subSecDateTimeOrig = $exif->{SubSecDateTimeOriginal};
+	if (!($dateTimeOrig or $subSecDateTimeOrig)) {
+		die "Neither DateTimeOriginal or SubSecDateTimeOriginal EXIF tags found. Exiting";
+	}
+	if (!$subSecDateTimeOrig) {
+		$subSecAvailable = 0;	
+	}
 	my $epoch = dateTimeToEpoch($dateTimeOrig);
 	my $subSecEpoch = dateTimeToEpoch($subSecDateTimeOrig);
-	print "$dateTimeOrig\t$epoch\n";
-	print "$subSecDateTimeOrig\t$subSecEpoch\n";
+	push @imageData, $exif;
 }
+
+print "subSecAvailable: $subSecAvailable\n";
 
 sub dateTimeToEpoch
 {
