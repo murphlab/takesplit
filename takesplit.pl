@@ -71,6 +71,8 @@ if ($subSecAvailable) {
 	$epochKey = "epoch";
 }
 
+my @sortedImageData = sort { $a->{$epochKey} <=> $b->{$epochKey} } @imageData;
+
 
 
 sub dateTimeToEpoch
