@@ -137,12 +137,13 @@ sub analyzeImageData
 
 				#print "BaseInterval for current set IS defined";
 
+				$currentSet->{intervalAverage} = $intervalSum / $#{$currentSet->{images}};
+
 				my $tolerance = $imageData->{epochKey} eq "epoch" ? 2.0 : 0.2;
 				if ( abs( $currentSet->{baseInterval} - $interval ) > $tolerance ) {
 
 					print "Greater than tolerance";
 
-					$currentSet->{intervalAverage} = $intervalSum / $#{$currentSet->{images}};
 					$intervalSum = 0;
 
 					push @sets, { images => [ $previousImage, $image ], baseInterval => $interval };	
