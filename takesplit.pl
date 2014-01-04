@@ -51,6 +51,9 @@ sub loadImageData
 
 	my @imageData;
 
+	my $previousEpoch;
+	my $previousSubSecEpoch;
+
 	for my $inFile (@inFiles) {
 		print "$inFile\n";
 		my $exif = ImageInfo($inFile);
@@ -73,23 +76,33 @@ sub loadImageData
 		}
 		my $epoch = dateTimeToEpoch($dateTimeOrig);
 		my $subSecEpoch = dateTimeToEpoch($subSecDateTimeOrig);
-		push @imageData, { file => $inFile, epoch => $epoch, subSecEpoch => $subSecEpoch };
+		
+		my $interval = -1;
+		my $subSecInterval = -1;
+		if (defined $previousEpoch) {
+			$interval = $epoch - $previousEpoch;
+			$subSecInterval = $subSecEpoch - $previousSubSecEpoch;
+		}
+		$previousEpoch = $epoch;
+		$previousSubSecEpoch = $subSecEpoch;
+		
+		push @imageData, { 
+					file => $inFile, 
+					epoch => $epoch, 
+					subSecEpoch => $subSecEpoch, 
+					interval => $interval, 
+					subSecInterval => $subSecInterval  
+				};
 	}
 
-#	my $epochKey;
-#	if ($subSecAvailable) {
-#		print "SubSecDateTimeOriginal available (subsecond resolution)\n";
-#		$epochKey = "subSecEpoch";
-#	} else {
-#		print "SubSecDateTimeOriginal not avaialbe so using DateTimeOriginal (one-second resolution)\n";
-#		$epochKey = "epoch";
-#	}
 
+	# force non-subsec as it seems inaccurate:
 	my $epochKey = "epoch";
+	my $intervalKey = "interval";
 
 	my @sortedImageData = sort { $a->{$epochKey} <=> $b->{$epochKey} } @imageData;
 
-	return { epochKey => $epochKey, images => \@sortedImageData };
+	return { epochKey => $epochKey, intervalKey => $intervalKey, images => \@sortedImageData };
 }
 
 sub analyzeImageData
@@ -108,9 +121,7 @@ sub analyzeImageData
 			
 			my $previousImage = ${$currentSet->{images}}[ $#{$currentSet->{images}} ];
 
-			#print "previousImage: ", Dumper($previousImage);
-
-			my $interval = $image->{$imageData->{epochKey}} - $previousImage->{$imageData->{epochKey}}; 
+			my $interval = $image->{$imageData->{intervalKey}};
 
 			#print "interval: $interval\n";
 			
@@ -151,14 +162,14 @@ sub printReport
 	print "Number of sets: $setCount\n";
 	for my $set (@{$sets}) {
 		my $imageCount = scalar @{$set->{images}};
-		my $interval = $set->{interval};
+		my $baseInterval = $set->{baseInterval};
 		my $firstImage = Dumper(${$set->{images}}[0]);
 		my $lastImage = Dumper(${$set->{images}}[ $#{$set->{images}} ]);
 		my $allImages = Dumper( $set->{images} );
 		print <<END;
 SET
 ---
-Interval: 	$interval
+Base interval: 	$baseInterval
 Image count:	$imageCount
 Images:
 $allImages
