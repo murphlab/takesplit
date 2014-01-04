@@ -77,8 +77,8 @@ sub loadImageData
 		my $epoch = dateTimeToEpoch($dateTimeOrig);
 		my $subSecEpoch = dateTimeToEpoch($subSecDateTimeOrig);
 		
-		my $interval = -1;
-		my $subSecInterval = -1;
+		my $interval = -999;
+		my $subSecInterval = -999;
 		if (defined $previousEpoch) {
 			$interval = $epoch - $previousEpoch;
 			$subSecInterval = $subSecEpoch - $previousSubSecEpoch;
@@ -109,6 +109,7 @@ sub analyzeImageData
 {
 	my $imageData = shift;
 	my @sets;
+	my $intervalSum = 0;
 	for my $image (@{$imageData->{images}}) {
 
 		print Dumper($image);
@@ -122,7 +123,7 @@ sub analyzeImageData
 			my $previousImage = ${$currentSet->{images}}[ $#{$currentSet->{images}} ];
 
 			my $interval = $image->{$imageData->{intervalKey}};
-
+			
 			#print "interval: $interval\n";
 			
 			if (!$currentSet->{baseInterval}) {
@@ -141,6 +142,9 @@ sub analyzeImageData
 
 					print "Greater than tolerance";
 
+					$currentSet->{intervalAverage} = $intervalSum / $#{$currentSet->{images}};
+					$intervalSum = 0;
+
 					push @sets, { images => [ $previousImage, $image ], baseInterval => $interval };	
 
 				} else {
@@ -148,6 +152,7 @@ sub analyzeImageData
 					push @{$currentSet->{images}}, $image;
 				}
 			}
+			$intervalSum += $interval;
 		}
 	}
 	return \@sets;
@@ -163,14 +168,16 @@ sub printReport
 	for my $set (@{$sets}) {
 		my $imageCount = scalar @{$set->{images}};
 		my $baseInterval = $set->{baseInterval};
+		my $intervalAverage = $set->{intervalAverage};
 		my $firstImage = Dumper(${$set->{images}}[0]);
 		my $lastImage = Dumper(${$set->{images}}[ $#{$set->{images}} ]);
 		my $allImages = Dumper( $set->{images} );
 		print <<END;
 SET
 ---
-Base interval: 	$baseInterval
-Image count:	$imageCount
+Base interval: 		$baseInterval
+Interval average: 	$intervalAverage
+Image count:		$imageCount
 Images:
 $allImages
 
