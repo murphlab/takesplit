@@ -29,8 +29,9 @@ die $USAGE unless $inputDir and $outputDir;
 die "inputDir must be a directory" unless -d $inputDir;
 die "outputDir must be a directory" unless -d $outputDir;
 
-my $data = loadImageData();
+my $imageData = loadImageData();
 
+my $takeData = analyzeImageData($imageData);
 
 
 ########
@@ -42,13 +43,14 @@ sub loadImageData
 	my @inFiles = (<$inputDir/*>);
 	my $inFileCount = scalar @inFiles;
 
-	#print "Read $inFileCount inFiles\n";
+	print "Read $inFileCount inFiles\n";
 
 	my $subSecAvailable = 1; 
 
 	my @imageData;
 
 	for my $inFile (@inFiles) {
+		print "$inFile\n";
 		my $exif = ImageInfo($inFile);
 		my $exifError = $exif->{Error};
 		if ($exifError) {
@@ -61,8 +63,8 @@ sub loadImageData
 		}
 		my $dateTimeOrig = $exif->{DateTimeOriginal};
 		my $subSecDateTimeOrig = $exif->{SubSecDateTimeOriginal};
-		if (!($dateTimeOrig or $subSecDateTimeOrig)) {
-			die "Neither DateTimeOriginal or SubSecDateTimeOriginal EXIF tags found in file:\"$inFile\" . Exiting";
+		if (!$dateTimeOrig) {
+			die "DateTimeOriginal EXIF tag not found in file:\"$inFile\" . Exiting";
 		}
 		if (!$subSecDateTimeOrig) {
 			$subSecAvailable = 0;	
@@ -72,18 +74,64 @@ sub loadImageData
 		push @imageData, { file => $inFile, epoch => $epoch, subSecEpoch => $subSecEpoch };
 	}
 
-	my $epochKey;
-	if ($subSecAvailable) {
-		print "SubSecDateTimeOriginal available (subsecond resolution)\n";
-		$epochKey = "subSecEpoch";
-	} else {
-		print "SubSecDateTimeOriginal not avaialbe so using DateTimeOriginal (one-second resolution)\n";
-		$epochKey = "epoch";
-	}
+#	my $epochKey;
+#	if ($subSecAvailable) {
+#		print "SubSecDateTimeOriginal available (subsecond resolution)\n";
+#		$epochKey = "subSecEpoch";
+#	} else {
+#		print "SubSecDateTimeOriginal not avaialbe so using DateTimeOriginal (one-second resolution)\n";
+#		$epochKey = "epoch";
+#	}
+
+	my $epochKey = "epoch";
 
 	my @sortedImageData = sort { $a->{$epochKey} <=> $b->{$epochKey} } @imageData;
 
-	return { key => $epochKey, imageData => \@sortedImageData };
+	return { epochKey => $epochKey, images => \@sortedImageData };
+}
+
+sub analyzeImageData
+{
+	my $imageData = shift;
+	my @sets;
+	for my $image (@{$imageData->{images}}) {
+
+		print Dumper($image);
+
+		if (!@sets) {
+			print "No sets, creating new set\n";
+			push @sets, { images => [ $image ] };
+		} else {
+			my $currentSet = $sets[ $#sets ];
+			
+			my $previousImage = ${$currentSet->{images}}[ $#{$currentSet->{images}} ];
+
+			#print "previousImage: ", Dumper($previousImage);
+
+			my $interval = $image->{$imageData->{epochKey}} - $previousImage->{$imageData->{epochKey}}; 
+
+			print "interval: $interval\n";
+			
+			if (!$currentSet->{interval}) {
+	
+				$currentSet->{interval} = $interval;
+				push @{$currentSet->{images}}, $image;
+
+			} else {
+
+				my $tolerance = $imageData->{epochKey} eq "epoch" ? 2.0 : 0.2;
+				if ( abs( $currentSet->{interval} - $interval ) > $tolerance ) {
+
+					push @sets, { images => [ $previousImage, $image ], interval => $interval };	
+
+				} else {
+
+					push @{$currentSet->{images}}, $image;
+				}
+			}
+ 
+		}
+	}
 }
 
 sub dateTimeToEpoch
