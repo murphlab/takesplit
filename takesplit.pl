@@ -31,7 +31,9 @@ die "outputDir must be a directory" unless -d $outputDir;
 
 my $imageData = loadImageData();
 
-my $takeData = analyzeImageData($imageData);
+my $sets = analyzeImageData($imageData);
+
+print "Number of sets: $#{$sets}\n";
 
 
 ########
@@ -129,9 +131,9 @@ sub analyzeImageData
 					push @{$currentSet->{images}}, $image;
 				}
 			}
- 
 		}
 	}
+	return \@sets;
 }
 
 sub dateTimeToEpoch
