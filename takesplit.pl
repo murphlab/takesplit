@@ -33,7 +33,7 @@ my $imageData = loadImageData();
 
 my $sets = analyzeImageData($imageData);
 
-print "Number of sets: $#{$sets}\n";
+printReport($sets);
 
 
 ########
@@ -112,19 +112,25 @@ sub analyzeImageData
 
 			my $interval = $image->{$imageData->{epochKey}} - $previousImage->{$imageData->{epochKey}}; 
 
-			print "interval: $interval\n";
+			#print "interval: $interval\n";
 			
-			if (!$currentSet->{interval}) {
+			if (!$currentSet->{baseInterval}) {
+
+				print "BaseInterval for current set NOT defined";
 	
-				$currentSet->{interval} = $interval;
+				$currentSet->{baseInterval} = $interval;
 				push @{$currentSet->{images}}, $image;
 
 			} else {
 
-				my $tolerance = $imageData->{epochKey} eq "epoch" ? 2.0 : 0.2;
-				if ( abs( $currentSet->{interval} - $interval ) > $tolerance ) {
+				#print "BaseInterval for current set IS defined";
 
-					push @sets, { images => [ $previousImage, $image ], interval => $interval };	
+				my $tolerance = $imageData->{epochKey} eq "epoch" ? 2.0 : 0.2;
+				if ( abs( $currentSet->{baseInterval} - $interval ) > $tolerance ) {
+
+					print "Greater than tolerance";
+
+					push @sets, { images => [ $previousImage, $image ], baseInterval => $interval };	
 
 				} else {
 
@@ -134,6 +140,33 @@ sub analyzeImageData
 		}
 	}
 	return \@sets;
+}
+
+sub printReport
+{
+	my $sets = shift;
+	my $setCount = $#{$sets};
+	print "SUMMARY\n";
+	print "=======\n";
+	print "Number of sets: $setCount\n";
+	for my $set (@{$sets}) {
+		my $imageCount = scalar @{$set->{images}};
+		my $interval = $set->{interval};
+		my $firstImage = Dumper(${$set->{images}}[0]);
+		my $lastImage = Dumper(${$set->{images}}[ $#{$set->{images}} ]);
+		my $allImages = Dumper( $set->{images} );
+		print <<END;
+SET
+---
+Interval: 	$interval
+Image count:	$imageCount
+Images:
+$allImages
+
+END
+
+
+	}
 }
 
 sub dateTimeToEpoch
