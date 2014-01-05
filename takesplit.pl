@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# TODO
+# - report when a file is shared in 2 sets
+
 use strict;
 
 my $exeDir;
