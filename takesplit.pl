@@ -45,8 +45,6 @@ my $imageData = loadImageData(\@inFiles);
 
 my $sets = analyzeImageData($imageData);
 
-#printReport($sets);
-
 copyFilesToOutputDir( \@inFiles, $sets );
 
 ########
@@ -95,7 +93,6 @@ sub loadImageData
 					subSecDateTimeOriginal => $subSecDateTimeOrig
 				};
 	}
-
 
 	# force non-subsec as it seems inaccurate:
 	my $epochKey = "epoch";
@@ -162,35 +159,6 @@ sub analyzeImageData
 	my @setsWithMinFrames = grep { @{$_->{images}} >= $minFrames } @sets;
 
 	return \@setsWithMinFrames;
-}
-
-sub printReport
-{
-	my $sets = shift;
-	my $setCount = scalar @{$sets};
-	print "SUMMARY\n";
-	print "=======\n";
-	print "Number of sets: $setCount\n";
-	for my $set (@{$sets}) {
-		my $imageCount = scalar @{$set->{images}};
-		my $baseInterval = $set->{baseInterval};
-		my $intervalAverage = $set->{intervalAverage};
-		my $firstImage = Dumper(${$set->{images}}[0]);
-		my $lastImage = Dumper(${$set->{images}}[ $#{$set->{images}} ]);
-		my $allImages = Dumper( $set->{images} );
-		print <<END;
-SET
----
-Base interval: 		$baseInterval
-Interval average: 	$intervalAverage
-Image count:		$imageCount
-Images:
-$allImages
-
-END
-
-
-	}
 }
 
 sub copyFilesToOutputDir
