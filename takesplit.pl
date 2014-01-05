@@ -187,7 +187,14 @@ END
 		my $flag = $firstFileInPrevSet ? "*" : "";
 		$repeatCount++ if $firstFileInPrevSet; 
 
-		# todo loop over images and copy
+		for my $image (@{$set->{images}}) {
+
+			my $file = $image->{file};
+
+			# todo: copy image
+
+			delete $fileHash{$file};
+		}
 
 		print <<END;
 DIRECTORY: 	$dirName
@@ -206,6 +213,14 @@ END
 
 END
 	}
+
+my @remainingFiles = keys %fileHash;
+my $remainingFileCount = scalar @remainingFiles;
+
+	print <<END;
+UNUSED FILES:	$remainingFileCount
+
+END
 
 }
 
