@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 
-# TODO
-
 use strict;
 
 my $exeDir;
@@ -60,7 +58,7 @@ sub loadImageData
 	my $inFileCount = scalar @{$inFilesRef};
 
 	print <<END;
-INFILE COUNT: 	$inFileCount
+Infile count: 	$inFileCount
 
 END
 	my $subSecAvailable = 1; 
@@ -170,7 +168,7 @@ sub copyFilesToOutputDir
 	print "!! REPORT ONLY (not copying files) !!\n\n" if ( $reportOnly ); 
 
 	print <<END;
-SET COUNT:	$setCount
+Set count:	$setCount
 
 END
 
@@ -218,13 +216,13 @@ END
 		print STDERR " Done.\n\n" if !$reportOnly;
 
 		print <<END;
-DIRECTORY: 	$dirName
-FILE COUNT:	$numFiles
-STARTS:		$firstFile->{dateTimeOriginal}
-ENDS:		$lastFile->{dateTimeOriginal}
-INTERVAL AVG:	$set->{intervalAverage}
-FIRST FILE:	$firstFile->{file} $flag
-LAST FILE:	$lastFile->{file}
+Directory: 	$dirName
+File count:	$numFiles
+Starts:		$firstFile->{dateTimeOriginal}
+Ends:		$lastFile->{dateTimeOriginal}
+Interval avg:	$set->{intervalAverage}
+First file:	$firstFile->{file} $flag
+Last file:	$lastFile->{file}
 
 END
 	}
@@ -250,8 +248,8 @@ my $remainingFileCount = scalar @remainingFiles;
 
 	if ($remainingFileCount) {
 		print <<END;
-UNUSED FILES:	$remainingFileCount
-DIRECTORY:	$UNUSED_FILE_DIR
+Unusued files:	$remainingFileCount
+Directory:	$UNUSED_FILE_DIR
 
 END
 	}
