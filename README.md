@@ -16,7 +16,7 @@ SYNOPSIS
 DESCRIPTION
 	This script is useful for organizing a bunch of images (say, on one card),
 	that contain multiple time-lapse sequences. It examines the time intervals
-	between them and makes it's best guess as to how they should be grouped.
+	between them and makes its best guess as to how they should be grouped.
 	There may be ambiguous situtations where it's not obvious which image
 	belongs to which sequence, in which case it will copy the same image
 	to both sequences.
