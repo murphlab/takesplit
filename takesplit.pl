@@ -57,13 +57,15 @@ sub loadImageData
 
 	my $inFileCount = scalar @{$inFilesRef};
 
-	print "Read $inFileCount inFiles\n";
+	print <<END;
+INFILE COUNT: 	$inFileCount
 
+END
 	my $subSecAvailable = 1; 
 
 	my @imageData;
 	for my $inFile (@{$inFilesRef}) {
-		print "$inFile\n";
+		print STDERR  ".";
 		my $exif = ImageInfo($inFile);
 		my $exifError = $exif->{Error};
 		if ($exifError) {
@@ -93,6 +95,7 @@ sub loadImageData
 					subSecDateTimeOriginal => $subSecDateTimeOrig
 				};
 	}
+	print STDERR " Done.\n\n";
 
 	# force non-subsec as it seems inaccurate:
 	my $epochKey = "epoch";
@@ -109,10 +112,7 @@ sub analyzeImageData
 	my $intervalSum = 0;
 	for my $image (@{$imageData->{images}}) {
 
-		print Dumper($image);
-
 		if (!@sets) {
-			print "No sets, creating new set\n";
 			push @sets, { images => [ $image ] };
 		} else {
 			my $currentSet = $sets[ $#sets ];
@@ -123,25 +123,17 @@ sub analyzeImageData
 
 			$image->{interval} = $interval;
 			
-			#print "interval: $interval\n";
-			
 			if (!$currentSet->{baseInterval}) {
 
-				print "BaseInterval for current set NOT defined";
-	
 				$currentSet->{baseInterval} = $interval;
 				push @{$currentSet->{images}}, $image;
 
 			} else {
 
-				#print "BaseInterval for current set IS defined";
-
 				$currentSet->{intervalAverage} = $intervalSum / $#{$currentSet->{images}};
 
 				my $tolerance = $imageData->{epochKey} eq "epoch" ? 2.0 : 0.2;
 				if ( abs( $currentSet->{baseInterval} - $interval ) > $tolerance ) {
-
-					print "Greater than tolerance";
 
 					$intervalSum = 0;
 
