@@ -18,6 +18,10 @@ use Getopt::Std;
 use Data::Dumper;
 use Time::Local;
 
+################
+# Main Program #
+################
+
 my $DEFAULT_MINIMUM_FRAMES = 3;
 
 my $USAGE = <<END;
@@ -35,7 +39,9 @@ die $USAGE unless $inputDir and $outputDir;
 die "inputDir must be a directory" unless -d $inputDir;
 die "outputDir must be a directory" unless -d $outputDir;
 
-my $imageData = loadImageData();
+my @inFiles = (<$inputDir/*>);
+
+my $imageData = loadImageData(\@inFiles);
 
 my $sets = analyzeImageData($imageData);
 
@@ -48,16 +54,16 @@ printReport($sets);
 
 sub loadImageData 
 {
-	my @inFiles = (<$inputDir/*>);
-	my $inFileCount = scalar @inFiles;
+	my $inFilesRef = shift;
+
+	my $inFileCount = scalar @{$inFilesRef};
 
 	print "Read $inFileCount inFiles\n";
 
 	my $subSecAvailable = 1; 
 
 	my @imageData;
-
-	for my $inFile (@inFiles) {
+	for my $inFile (@{$inFilesRef}) {
 		print "$inFile\n";
 		my $exif = ImageInfo($inFile);
 		my $exifError = $exif->{Error};
