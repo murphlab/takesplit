@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # TODO
-# - report when a file is shared in 2 sets
+# - report only mode: doesn't copy files
 
 use strict;
 
@@ -45,8 +45,9 @@ my $imageData = loadImageData(\@inFiles);
 
 my $sets = analyzeImageData($imageData);
 
-printReport($sets);
+#printReport($sets);
 
+copyFilesToOutputDir( \@inFiles, $sets );
 
 ########
 # Subs #
@@ -89,7 +90,9 @@ sub loadImageData
 		push @imageData, { 
 					file => $inFile, 
 					epoch => $epoch, 
-					subSecEpoch => $subSecEpoch 
+					subSecEpoch => $subSecEpoch, 
+					dateTimeOriginal => $dateTimeOrig,
+					subSecDateTimeOriginal => $subSecDateTimeOrig
 				};
 	}
 
@@ -188,6 +191,62 @@ END
 
 
 	}
+}
+
+sub copyFilesToOutputDir
+{
+	my $inFilesRef = shift;
+	my $sets = shift;
+
+	my $setCount = scalar @{$sets};	
+	my $lastSet = $setCount - 1;
+	my $digitCount = length $lastSet;
+
+	print <<END;
+SET COUNT:	$setCount
+
+END
+
+	my %fileHash;
+	for my $file (@{$inFilesRef}) {
+		$fileHash{$file} = 1;
+	}
+	
+	my $lastImageOfPreviousSet;
+	my $repeatCount = 0;
+
+	my $i = 0;
+	for my $set (@{$sets}) {
+		my $dirName = sprintf( "%0${digitCount}d", $i++ );
+		my $numFiles = scalar @{$set->{images}};
+		my $firstFile = ${$set->{images}}[0];
+		my $lastFile = ${$set->{images}}[$numFiles - 1];
+		
+		my $firstFileInPrevSet = ($firstFile->{file} eq $lastImageOfPreviousSet);		
+		$lastImageOfPreviousSet = $lastFile->{file};
+		my $flag = $firstFileInPrevSet ? "*" : "";
+		$repeatCount++ if $firstFileInPrevSet; 
+
+		# todo loop over images and copy
+
+		print <<END;
+DIRECTORY: 	$dirName
+FILE COUNT:	$numFiles
+STARTS:		$firstFile->{dateTimeOriginal}
+ENDS:		$lastFile->{dateTimeOriginal}
+INTERVAL AVG:	$set->{intervalAverage}
+FIRST FILE:	$firstFile->{file} $flag
+LAST FILE:	$lastFile->{file}
+
+END
+	}
+	if ($repeatCount) {
+		print <<END;
+* Indicates files with ambiguous intervals repeated across sets.
+
+END
+	}
+
 }
 
 sub dateTimeToEpoch
