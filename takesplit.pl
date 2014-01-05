@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # Takesplit -- a tool for organizing a bunch of image files into time-lapse "takes."
-# Copyright (C) 2014 Ken Murphy <ken@murphlab.com>
+# Copyright (C) 2014 Ken Murphy http://www.murphlab.com
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
