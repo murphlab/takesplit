@@ -15,15 +15,18 @@ use Getopt::Std;
 use Data::Dumper;
 use Time::Local;
 
+my $DEFAULT_MINIMUM_FRAMES = 3;
+
 my $USAGE = <<END;
-USAGE: $0 -i <inputDir> -o <outputDir>
+USAGE: $0 -i <inputDir> -o <outputDir> [-m <minimum frames per sequence (default $DEFAULT_MINIMUM_FRAMES)>]
 END
 
 my %o=();
-getopts("i:o:",\%o);
+getopts("i:o:m:",\%o);
 
 my $inputDir = $o{i};
 my $outputDir = $o{o};
+my $minFrames = $o{m} ? $o{m} : $DEFAULT_MINIMUM_FRAMES;
 
 die $USAGE unless $inputDir and $outputDir;
 die "inputDir must be a directory" unless -d $inputDir;
@@ -156,13 +159,16 @@ sub analyzeImageData
 			$intervalSum += $interval;
 		}
 	}
-	return \@sets;
+
+	my @setsWithMinFrames = grep { @{$_->{images}} >= $minFrames } @sets;
+
+	return \@setsWithMinFrames;
 }
 
 sub printReport
 {
 	my $sets = shift;
-	my $setCount = $#{$sets};
+	my $setCount = scalar @{$sets};
 	print "SUMMARY\n";
 	print "=======\n";
 	print "Number of sets: $setCount\n";
