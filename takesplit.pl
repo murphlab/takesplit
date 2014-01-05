@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
 # TODO
-# - report only mode: doesn't copy files
 
 use strict;
 
@@ -17,6 +16,7 @@ use Image::ExifTool qw(:Public);
 use Getopt::Std;
 use Data::Dumper;
 use Time::Local;
+use File::Copy;
 
 ################
 # Main Program #
@@ -26,19 +26,20 @@ my $DEFAULT_MINIMUM_FRAMES = 3;
 my $UNUSED_FILE_DIR = "noset";
 
 my $USAGE = <<END;
-USAGE: $0 -i <inputDir> -o <outputDir> [-m <minimum frames per sequence (default $DEFAULT_MINIMUM_FRAMES)>]
+USAGE: $0 -i <inputDir> -o <outputDir> [-m <minimum frames per sequence (default $DEFAULT_MINIMUM_FRAMES)>] [-r (report only)]
 END
 
 my %o=();
-getopts("i:o:m:",\%o);
+getopts("i:o:m:r",\%o);
 
 my $inputDir = $o{i};
 my $outputDir = $o{o};
 my $minFrames = $o{m} ? $o{m} : $DEFAULT_MINIMUM_FRAMES;
+my $reportOnly = $o{r} ? 1 : 0;
 
-die $USAGE unless $inputDir and $outputDir;
+die $USAGE unless $inputDir and ($outputDir or $reportOnly);
 die "inputDir must be a directory" unless -d $inputDir;
-die "outputDir must be a directory" unless -d $outputDir;
+die "outputDir must be a directory" unless $reportOnly or -d $outputDir;
 
 my @inFiles = (<$inputDir/*>);
 
@@ -46,7 +47,7 @@ my $imageData = loadImageData(\@inFiles);
 
 my $sets = analyzeImageData($imageData);
 
-copyFilesToOutputDir( \@inFiles, $sets );
+copyFilesToOutputDir( \@inFiles, $sets, $outputDir, $reportOnly );
 
 ########
 # Subs #
@@ -64,6 +65,7 @@ INFILE COUNT: 	$inFileCount
 END
 	my $subSecAvailable = 1; 
 
+	print STDERR "Reading";
 	my @imageData;
 	for my $inFile (@{$inFilesRef}) {
 		print STDERR  ".";
@@ -158,10 +160,14 @@ sub copyFilesToOutputDir
 {
 	my $inFilesRef = shift;
 	my $sets = shift;
+	my $outputDir = shift;
+	my $reportOnly = shift;
 
 	my $setCount = scalar @{$sets};	
 	#my $lastSet = $setCount - 1;
 	#my $digitCount = length $lastSet;
+
+	print "!! REPORT ONLY (not copying files) !!\n\n" if ( $reportOnly ); 
 
 	print <<END;
 SET COUNT:	$setCount
@@ -191,14 +197,25 @@ END
 		my $flag = $firstFileInPrevSet ? "*" : "";
 		$repeatCount++ if $firstFileInPrevSet; 
 
+		if (!$reportOnly) {
+			mkdir "$outputDir/$dirName";
+		}
+
+		print STDERR "Copying" if (!$reportOnly); 
+
 		for my $image (@{$set->{images}}) {
 
 			my $file = $image->{file};
 
-			# todo: copy image
+			if (!$reportOnly) {
+				copy( $file, "$outputDir/$dirName" ) or die "Could not copy file: $file $!";
+				print STDERR ".";
+			}
 
 			delete $fileHash{$file};
 		}
+		
+		print STDERR " Done.\n\n" if !$reportOnly;
 
 		print <<END;
 DIRECTORY: 	$dirName
@@ -220,6 +237,16 @@ END
 
 my @remainingFiles = keys %fileHash;
 my $remainingFileCount = scalar @remainingFiles;
+
+	if (!$reportOnly) {
+		print STDERR "Copying" if $remainingFileCount;
+		mkdir "$outputDir/$UNUSED_FILE_DIR";
+		for my $file (@remainingFiles) {
+			copy( $file, "$outputDir/$UNUSED_FILE_DIR" ) or die "Could not copy file: $file $!";
+			print STDERR ".";
+		}
+		print STDERR " Done.\n\n" if $remainingFileCount;
+	}
 
 	if ($remainingFileCount) {
 		print <<END;
