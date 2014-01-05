@@ -1,7 +1,10 @@
 takesplit
 =========
 
-Tool for organizing a bunch of files into time-lapse "takes."
+Perl script for organizing a bunch of files into time-lapse "takes."
+
+This requires the Perl ExifTool module:
+http://www.sno.phy.queensu.ca/~phil/exiftool/
 
 ```
 NAME
