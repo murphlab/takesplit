@@ -52,8 +52,6 @@ Here is an example of the report output:
 ```
 Infile count:   1171
 
-!! REPORT ONLY (not copying files) !!
-
 Set count:      7
 
 Directory:      2013-12-23-14-38-55
