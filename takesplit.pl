@@ -1,5 +1,21 @@
 #!/usr/bin/perl
 
+# Takesplit -- a tool for organizing a bunch of image files into time-lapse "takes."
+# Copyright (C) 2014 Ken Murphy <ken@murphlab.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 use strict;
 
 my $exeDir;
@@ -35,7 +51,7 @@ SYNOPSIS
 
 DESCRIPTION
 	This script is useful for organizing a bunch of images (say, on one card),
-	that contain multiple time-lapse sequences. It examins the intervals
+	that contain multiple time-lapse sequences. It examines the time intervals
 	between them and makes it's best guess as to how they should be grouped.
 	There may be ambiguous situtations where it's not obvious which image
 	belongs to which sequence, in which case it will copy the same image
