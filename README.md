@@ -54,42 +54,62 @@ Infile count:   1171
 
 Set count:      7
 
-Directory:      2013-12-23-14-38-55
-File count:     101
-Starts:         2013:12:23 14:38:55
-Ends:           2013:12:23 14:47:14
-Interval avg:   4.99
-First file:     input//IMG_8889.CR2 
-Last file:      input//IMG_8989.CR2
+Directory: 	2013-12-23-14-38-55
+File count:	101
+Starts:		2013:12:23 14:38:55
+Ends:		2013:12:23 14:47:14
+Interval avg:	4.99
+First file:	input//IMG_8889.CR2 
+Last file:	input//IMG_8989.CR2
 
-Directory:      2013-12-23-14-47-26
-File count:     360
-Starts:         2013:12:23 14:47:26
-Ends:           2013:12:23 15:17:20
-Interval avg:   4.99721448467967
-First file:     input//IMG_8990.CR2 
-Last file:      input//IMG_9349.CR2
+Directory: 	2013-12-23-14-47-26
+File count:	360
+Starts:		2013:12:23 14:47:26
+Ends:		2013:12:23 15:17:20
+Interval avg:	4.99721448467967
+First file:	input//IMG_8990.CR2 
+Last file:	input//IMG_9349.CR2
 
-Directory:      2013-12-23-15-17-29
-File count:     251
-Starts:         2013:12:23 15:17:29
-Ends:           2013:12:23 15:38:18
-Interval avg:   4.996
-First file:     input//IMG_9350.CR2 
-Last file:      input//IMG_9600.CR2
+Directory: 	2013-12-23-15-17-29
+File count:	251
+Starts:		2013:12:23 15:17:29
+Ends:		2013:12:23 15:38:18
+Interval avg:	4.996
+First file:	input//IMG_9350.CR2 
+Last file:	input//IMG_9600.CR2
 
-Directory:      2013-12-23-15-44-49
-File count:     26
-Starts:         2013:12:23 15:44:49
-Ends:           2013:12:23 15:46:55
-Interval avg:   5.04
-First file:     input//IMG_9606.CR2 
-Last file:      input//IMG_9631.CR2
+Directory: 	2013-12-23-15-44-49
+File count:	26
+Starts:		2013:12:23 15:44:49
+Ends:		2013:12:23 15:46:55
+Interval avg:	5.04
+First file:	input//IMG_9606.CR2 
+Last file:	input//IMG_9631.CR2
 
-Directory:      2013-12-23-15-51-14
-File count:     243
-Starts:         2013:12:23 15:51:14
-Ends:           2013:12:23 16:11:24
-Interval avg:   5
-First file:     input//IMG_9663.CR2
+Directory: 	2013-12-23-15-51-14
+File count:	243
+Starts:		2013:12:23 15:51:14
+Ends:		2013:12:23 16:11:24
+Interval avg:	5
+First file:	input//IMG_9663.CR2 
+Last file:	input//IMG_9905.CR2
+
+Directory: 	2013-12-23-16-21-27
+File count:	5
+Starts:		2013:12:23 16:21:27
+Ends:		2013:12:23 16:21:47
+Interval avg:	5
+First file:	input//IMG_9914.CR2 
+Last file:	input//IMG_9918.CR2
+
+Directory: 	2013-12-23-16-22-02
+File count:	182
+Starts:		2013:12:23 16:22:02
+Ends:		2013:12:23 16:37:06
+Interval avg:	4.99444444444444
+First file:	input//IMG_9919.CR2 
+Last file:	input//IMG_0101.CR2
+
+Unusued files:	3
+Directory:	noset
 ```
