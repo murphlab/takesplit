@@ -23,6 +23,7 @@ use Time::Local;
 ################
 
 my $DEFAULT_MINIMUM_FRAMES = 3;
+my $UNUSED_FILE_DIR = "noset";
 
 my $USAGE = <<END;
 USAGE: $0 -i <inputDir> -o <outputDir> [-m <minimum frames per sequence (default $DEFAULT_MINIMUM_FRAMES)>]
@@ -220,10 +221,13 @@ END
 my @remainingFiles = keys %fileHash;
 my $remainingFileCount = scalar @remainingFiles;
 
-	print <<END;
+	if ($remainingFileCount) {
+		print <<END;
 UNUSED FILES:	$remainingFileCount
+DIRECTORY:	$UNUSED_FILE_DIR
 
 END
+	}
 
 }
 
