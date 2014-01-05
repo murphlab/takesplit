@@ -54,9 +54,6 @@ sub loadImageData
 
 	my @imageData;
 
-	my $previousEpoch;
-	my $previousSubSecEpoch;
-
 	for my $inFile (@inFiles) {
 		print "$inFile\n";
 		my $exif = ImageInfo($inFile);
@@ -80,32 +77,20 @@ sub loadImageData
 		my $epoch = dateTimeToEpoch($dateTimeOrig);
 		my $subSecEpoch = dateTimeToEpoch($subSecDateTimeOrig);
 		
-		my $interval = -999;
-		my $subSecInterval = -999;
-		if (defined $previousEpoch) {
-			$interval = $epoch - $previousEpoch;
-			$subSecInterval = $subSecEpoch - $previousSubSecEpoch;
-		}
-		$previousEpoch = $epoch;
-		$previousSubSecEpoch = $subSecEpoch;
-		
 		push @imageData, { 
 					file => $inFile, 
 					epoch => $epoch, 
-					subSecEpoch => $subSecEpoch, 
-					interval => $interval, 
-					subSecInterval => $subSecInterval  
+					subSecEpoch => $subSecEpoch 
 				};
 	}
 
 
 	# force non-subsec as it seems inaccurate:
 	my $epochKey = "epoch";
-	my $intervalKey = "interval";
 
 	my @sortedImageData = sort { $a->{$epochKey} <=> $b->{$epochKey} } @imageData;
 
-	return { epochKey => $epochKey, intervalKey => $intervalKey, images => \@sortedImageData };
+	return { epochKey => $epochKey, images => \@sortedImageData };
 }
 
 sub analyzeImageData
@@ -125,7 +110,9 @@ sub analyzeImageData
 			
 			my $previousImage = ${$currentSet->{images}}[ $#{$currentSet->{images}} ];
 
-			my $interval = $image->{$imageData->{intervalKey}};
+			my $interval = $image->{$imageData->{epochKey}} - $previousImage->{$imageData->{epochKey}};
+
+			$image->{interval} = $interval;
 			
 			#print "interval: $interval\n";
 			
