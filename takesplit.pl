@@ -159,8 +159,8 @@ sub copyFilesToOutputDir
 	my $sets = shift;
 
 	my $setCount = scalar @{$sets};	
-	my $lastSet = $setCount - 1;
-	my $digitCount = length $lastSet;
+	#my $lastSet = $setCount - 1;
+	#my $digitCount = length $lastSet;
 
 	print <<END;
 SET COUNT:	$setCount
@@ -177,10 +177,13 @@ END
 
 	my $i = 0;
 	for my $set (@{$sets}) {
-		my $dirName = sprintf( "%0${digitCount}d", $i++ );
+		#my $dirName = sprintf( "%0${digitCount}d", $i++ );
 		my $numFiles = scalar @{$set->{images}};
 		my $firstFile = ${$set->{images}}[0];
 		my $lastFile = ${$set->{images}}[$numFiles - 1];
+
+		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($firstFile->{epoch});
+		my $dirName = sprintf("%4d-%02d-%02d-%02d-%02d-%02d", $year+1900, $mon+1, $mday, $hour, $min, $sec);
 		
 		my $firstFileInPrevSet = ($firstFile->{file} eq $lastImageOfPreviousSet);		
 		$lastImageOfPreviousSet = $lastFile->{file};
