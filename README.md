@@ -46,3 +46,52 @@ DESCRIPTION
 
 	takesplit.pl -i /Volumes/CARD1 -o ~/Photos/2014-01-05-TLShoot > ~/Photos/2014-01-05-TLShoot/summary.txt
 ```
+
+Here is an example of the report output:
+
+```
+Infile count:   1171
+
+!! REPORT ONLY (not copying files) !!
+
+Set count:      7
+
+Directory:      2013-12-23-14-38-55
+File count:     101
+Starts:         2013:12:23 14:38:55
+Ends:           2013:12:23 14:47:14
+Interval avg:   4.99
+First file:     input//IMG_8889.CR2 
+Last file:      input//IMG_8989.CR2
+
+Directory:      2013-12-23-14-47-26
+File count:     360
+Starts:         2013:12:23 14:47:26
+Ends:           2013:12:23 15:17:20
+Interval avg:   4.99721448467967
+First file:     input//IMG_8990.CR2 
+Last file:      input//IMG_9349.CR2
+
+Directory:      2013-12-23-15-17-29
+File count:     251
+Starts:         2013:12:23 15:17:29
+Ends:           2013:12:23 15:38:18
+Interval avg:   4.996
+First file:     input//IMG_9350.CR2 
+Last file:      input//IMG_9600.CR2
+
+Directory:      2013-12-23-15-44-49
+File count:     26
+Starts:         2013:12:23 15:44:49
+Ends:           2013:12:23 15:46:55
+Interval avg:   5.04
+First file:     input//IMG_9606.CR2 
+Last file:      input//IMG_9631.CR2
+
+Directory:      2013-12-23-15-51-14
+File count:     243
+Starts:         2013:12:23 15:51:14
+Ends:           2013:12:23 16:11:24
+Interval avg:   5
+First file:     input//IMG_9663.CR2
+```
