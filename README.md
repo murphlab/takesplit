@@ -26,7 +26,7 @@ DESCRIPTION
 	in any of the takes are copied to the "noset" subdirectory.
 
 	A summary of the analysis and resulting directory structure is written
-	to STDERR. It would probably be useful to redirect this output to a 
+	to STDOUT. It would probably be useful to redirect this output to a 
 	file.
 
 	The options are as follows:
